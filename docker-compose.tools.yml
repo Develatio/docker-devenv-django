@@ -1,0 +1,45 @@
+version: "3.2"
+
+services:
+  backup:
+    image: postgres:9.6.6-alpine
+    container_name: proyecto-django-backup
+    env_file:
+      - ./src/.env
+    depends_on:
+      - postgres
+    command: >
+      /bin/bash -c "
+        while ! nc -z $${DATABASE_HOST} $${DATABASE_PORT} ; do
+            sleep 5s
+        done
+        pg_dump --dbname=postgresql://$${DATABASE_USER}:$${DATABASE_PASSWORD}@$${DATABASE_HOST}/$${DATABASE_NAME} | gzip > /backup/$${DATABASE_NAME}.dump.gz
+      "
+    networks:
+      - proyecto-django-internal
+    volumes:
+      - ./data/backup:/backup
+
+  restore:
+    image: postgres:9.6.6-alpine
+    container_name: proyecto-django-restore
+    env_file:
+      - ./src/.env
+    depends_on:
+      - postgres
+    command: >
+      /bin/bash -c "
+        while ! nc -z $${DATABASE_HOST} $${DATABASE_PORT} ; do
+            sleep 5s
+        done
+        PGPASSWORD=$${DATABASE_PASSWORD} dropdb --if-exists --host=$${DATABASE_HOST} --port=$${DATABASE_PORT} --username=$${DATABASE_USER} $${DATABASE_NAME}
+        PGPASSWORD=$${DATABASE_PASSWORD} createdb --host=$${DATABASE_HOST} --port=$${DATABASE_PORT} --username=$${DATABASE_USER} $${DATABASE_NAME}
+        gunzip -c /backup/$${DATABASE_NAME}.dump.gz | psql --dbname=postgresql://$${DATABASE_USER}:$${DATABASE_PASSWORD}@$${DATABASE_HOST}/$${DATABASE_NAME}
+      "
+    networks:
+      - proyecto-django-internal
+    volumes:
+      - ./data/backup:/backup
+
+networks:
+  proyecto-django-internal: {}

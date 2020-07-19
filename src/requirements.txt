@@ -1,0 +1,8 @@
+celery==4.4.2
+Django==2.2.12
+django-redis==4.11.0
+flower==0.9.4
+ipython==7.14.0
+psycopg2==2.8.5
+redis==3.5.0
+python-decouple==3.3

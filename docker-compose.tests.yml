@@ -1,0 +1,38 @@
+version: "3.2"
+
+services:
+  proyecto-django-tests:
+    build: .
+    container_name: proyecto-django-tests
+    env_file:
+      - ./src/.env
+      - ./src/.env.tests
+    networks:
+      - proyecto-django-internal
+    depends_on:
+      - redis-tests
+      - postgres-tests
+    volumes:
+      - ./src:/app/
+      - ./media:/data/media
+
+  postgres-tests:
+    image: postgres:9.6.6-alpine
+    container_name: proyecto-django-postgres-tests
+    env_file:
+      - ./src/.env.tests
+    networks:
+      - proyecto-django-internal
+    volumes:
+      - ./data/postgres-tests:/var/lib/postgresql/data
+
+  redis-tests:
+    image: redis:3.2.8-alpine
+    container_name: proyecto-django-redis-tests
+    volumes:
+      - ./data/redis-tests:/data
+    networks:
+      - proyecto-django-internal
+
+networks:
+  proyecto-django-internal: {}
