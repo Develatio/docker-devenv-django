@@ -10,7 +10,7 @@ A `Makefile` is provided, it contains targets for the most common tasks.
 
 It provides a well tested and fully functional working development environment for Python / Django projects. It also has some extra features, like:
 
-* HTTPS by default (with valid certificates it you run `make install_certs`).
+* HTTPS by default (with valid certificates if you run `make install_certs`).
 * Commands for creating and restoring backups.
 * Commands for managing the containers and images.
 
