@@ -38,7 +38,7 @@ shell:
 	docker-compose -f docker-compose.yml run --rm proyecto-django python manage.py shell
 
 attach:
-	docker attach `docker-compose -f docker-compose.yml ps -q proyecto-django`
+	docker attach `docker container inspect proyecto-django -f '{{.Id}}'`
 
 logs:
 	docker-compose -f docker-compose.yml logs --tail 250 -f ${ARGS}
